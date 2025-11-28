@@ -187,7 +187,7 @@ export default function DetailedQuestionCard({ questionId, canEdit = false, onSh
               ▲
             </button>
 
-            <div className="text-sm font-semibold w-10 text-center">{(question as any).upvotes ?? question.score}</div>
+            <div className="text-sm font-semibold w-10 text-center">{(question as any).upvotes ?? question.upvotes}</div>
 
             <button
               onClick={() => {

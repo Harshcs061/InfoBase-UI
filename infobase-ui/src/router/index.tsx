@@ -12,7 +12,6 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "/question", element: <QuestionsPage /> },
       {path: "/questions/:id", element: <ViewQuestionPage />},
-      
     ],
   },
 ]);

@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 export default function ViewQuestionPage() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const id = useParams<{id:string}>();
+  const {id} = useParams<{id:string}>();
   const questionId = Number(id);
 
   useEffect(() => {

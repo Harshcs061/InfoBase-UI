@@ -8,10 +8,9 @@ export interface User{
   id: number;
   name: string;
   avatar?: string;
-  skills: string;
+  skills: string[];
   initials: string;
-  contributionTags?: string[];
-  project: number;
+  project: string;
 }
 
 export interface Question {
@@ -64,3 +63,8 @@ export interface Comment {
 
 
 export type SortOption = 'Most Upvoted' | 'Most Recent' | 'Most Answered';
+
+export type UserState = {
+  userInfo: User | null;
+  isLoggedIn: Boolean;
+}
