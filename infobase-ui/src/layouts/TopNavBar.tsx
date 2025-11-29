@@ -1,12 +1,14 @@
 import { Search } from "lucide-react";
-import { Bell } from "lucide-react";
+import NotificationToggle from "../components/NotificationToggle";
+import ProfileToggle from "../components/ProfileToggle";
 
 export default function TopNavbar() {
+
   return (
     <div className="w-full flex items-center justify-between px-4 py-3 bg-white shadow-sm border-b">
       <div className="flex items-center gap-2">
         <button className="bg-blue-600 text-white px-4 py-2 rounded-xl font-semibold shadow-sm">
-          Q&A
+          Infobase
         </button>
       </div>
 
@@ -23,13 +25,21 @@ export default function TopNavbar() {
 
       <div className="flex items-center gap-4">
         <div className="relative">
-          <Bell className="w-6 h-6 text-gray-600 cursor-pointer" />
-          <span className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full"></span>
+          <NotificationToggle />
+        {/* <span className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full"></span> */}
         </div>
 
-        <div className="w-10 h-10 rounded-full bg-purple-400 flex items-center justify-center text-white font-bold cursor-pointer">
-          JD
-        </div>
+        <ProfileToggle
+        name="Vivek Napit"
+        avatarUrl={null}
+        onViewProfile={() => {
+          // e.g., navigate("/profile");
+          console.log("view profile");
+        }}
+        onLogout={() => {
+          console.log("logout");
+        }}
+      />
       </div>
     </div>
   );

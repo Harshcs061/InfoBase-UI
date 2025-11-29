@@ -4,6 +4,8 @@ import HomePage from '../pages/HomePage';
 import QuestionsPage from '../pages/QuestionsPage';
 import ViewQuestionPage from '../pages/ViewQuestionPage';
 import AskQuestionPage from '../pages/AskQuestionPage';
+import LoginPage from '../pages/LoginPage';
+//import ProtectedRoute from './ProtectedRoute';
 
 const router = createBrowserRouter([
   {
