@@ -29,6 +29,8 @@ export interface QuestionsState {
   items: Question[];
   isLoading: boolean;
   error: string | null | undefined;
+  currentQuestion: Question | null; 
+  drafts: QuestionDraft[]; 
 }
 
 export interface FiltersState {
