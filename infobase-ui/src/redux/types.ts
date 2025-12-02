@@ -8,9 +8,10 @@ export interface User{
   id: number;
   name: string;
   avatar?: string;
-  skills: string[];
+  skills: string;
   initials: string;
-  project: string;
+  contributionTags?: string[];
+  project: number;
 }
 
 export interface Question {
@@ -29,6 +30,8 @@ export interface QuestionsState {
   items: Question[];
   isLoading: boolean;
   error: string | null | undefined;
+  currentQuestion: Question | null; 
+  drafts: QuestionDraft[]; 
 }
 
 export interface FiltersState {
@@ -58,13 +61,25 @@ export interface Comment {
   created_at: string;
   updated_at?: string;
   edited?: boolean;
-  pending?: boolean; // client-only optimistic flag
+  pending?: boolean; 
+}
+
+
+export interface QuestionDraft {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateQuestionPayload {
+  title: string;
+  description: string;
+  tags: string[];
+  visibility?: string;
 }
 
 
 export type SortOption = 'Most Upvoted' | 'Most Recent' | 'Most Answered';
-
-export type UserState = {
-  user: User | null;
-  isLoggedIn: Boolean;
-}
