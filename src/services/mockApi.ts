@@ -1,4 +1,4 @@
-import { mockQuestions, mockUsers, mockTags, mockAnswers } from '../data/index';
+import { mockQuestions, mockUsers, mockAnswers } from '../data/index';
 import type { Question, QuestionDraft, CreateQuestionPayload } from '../redux/types';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
