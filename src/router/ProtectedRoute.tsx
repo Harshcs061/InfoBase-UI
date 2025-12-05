@@ -5,6 +5,7 @@ import type React from "react";
 import { Logout, SetLoginDetails } from "../redux/slices/UserSlice";
 import { getUser } from "../services/UserServices";
 import { useEffect } from "react";
+import { TOKEN_KEY } from "../services/Payload";
 
 type Props = {
     children?: React.ReactNode;
@@ -17,6 +18,10 @@ export default function ProtectedRoute({children}: Props) {
 
   useEffect(() => {
     (async () => {
+      // temp routing handling will change after getting /me api
+      if(window.localStorage.getItem(TOKEN_KEY) != null){
+        return;
+      }
       const user = await getUser();
       if(user){
         dispatch(SetLoginDetails(user));

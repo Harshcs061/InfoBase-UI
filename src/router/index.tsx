@@ -4,7 +4,7 @@ import HomePage from '../pages/HomePage';
 import ViewQuestionPage from '../pages/ViewQuestionPage';
 import LoginPage from '../pages/LoginPage';
 import AskQuestionPage from '../pages/AskQuestionPage';
-//import ProtectedRoute from './ProtectedRoute';
+import ProtectedRoute from './ProtectedRoute';
 
 const router = createBrowserRouter([
   {path: "/login",
@@ -12,7 +12,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element:<MainLayout />,
+    element:<ProtectedRoute><MainLayout /></ProtectedRoute>,
     children: [
       { index: true, element: <HomePage /> },
       { path: "/ask", element: <AskQuestionPage /> },
