@@ -1,3 +1,5 @@
+import type { UserShort } from "../services/Payload";
+
 export interface Author {
   name: string;
   avatar: string;
@@ -14,14 +16,15 @@ export interface User{
 
 export interface Question {
   id: number;
-  author: User;
   title: string;
   description: string;
   tags: string[];
-  upvotes: number;
-  answers: number;
-  askedAt: string;
-  lastActivity: string;
+  askedBy: UserShort;
+  votes: number;
+  answer_count: number;
+  views: number;
+  related_project:string,
+  createdAt:string;
 }
 
 export interface QuestionsState {
@@ -30,6 +33,13 @@ export interface QuestionsState {
   error: string | null | undefined;
   currentQuestion: Question | null; 
   drafts: QuestionDraft[]; 
+  pagination?: Pagination;
+}
+
+export interface Pagination {
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface FiltersState {

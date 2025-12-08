@@ -1,4 +1,4 @@
-import type { Tag, User } from "../redux/types"
+import type { Question, Tag, User } from "../redux/types"
 
 export interface LoginPayload{
     email: string,
@@ -19,14 +19,27 @@ export interface QuestionResponse{
     tittle:string,
     description:string,
     tags: string[],
-    askedBy: User,
+    askedBy: UserShort,
     createdAt: string,
     relatedProject: string
+}
+
+export interface AllQuestionResponse{
+    total:number,
+    page:number,
+    limit:number,
+    questions:Question[]
 }
 export interface CreateQuestionResponse{
     status:boolean,
     message: string,
     question: QuestionResponse
+}
+
+export interface UserShort{
+    id:number,
+    name:string,
+    email:string
 }
 
 export const TOKEN_KEY = "Infobase-Token";

@@ -1,20 +1,20 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import type { Question, QuestionsState, QuestionDraft, CreateQuestionPayload } from '../types';
 import { mockApi } from '../../services/mockApi';
-import { createQuestionApi } from '../../services/QuestionService';
+import { createQuestionApi, getAllQuestions, getQuestionById } from '../../services/QuestionService';
+import type { QuestionResponse } from '../../services/Payload';
 
 export const fetchQuestions = createAsyncThunk(
   'questions/fetchQuestions',
-  async () => {
-    const questions = await mockApi.questions.getAll();
-    return questions;
+  async ({ page = 1, limit = 20 }: { page?: number; limit?: number } = {}) => {
+    const response = await getAllQuestions(page, limit);
+    return response;
   }
 );
-
 export const fetchQuestionById = createAsyncThunk(
   'questions/fetchQuestionById',
   async (id: number) => {
-    const question = await mockApi.questions.getById(id);
+    const question = await getQuestionById(id);
     if (!question) throw new Error('Question not found');
     return { questionId: id, question };
   }
@@ -112,7 +112,7 @@ const questionsSlice = createSlice({
     upvoteQuestionOptimistic: (state, action: PayloadAction<number>) => {
       const question = state.items.find(q => q.id === action.payload);
       if (question) {
-        question.upvotes += 1;
+        question.votes += 1;
       }
     },
     clearError: (state) => {
@@ -134,7 +134,7 @@ const questionsSlice = createSlice({
       })
       .addCase(fetchQuestions.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.items = action.payload;
+        state.items = action.payload.questions;
       })
       .addCase(fetchQuestions.rejected, (state, action) => {
         state.isLoading = false;
@@ -166,10 +166,10 @@ const questionsSlice = createSlice({
       .addCase(upvoteQuestion.fulfilled, (state, action) => {
         const question = state.items.find(q => q.id === action.payload.id);
         if (question) {
-          question.upvotes = action.payload.newUpvotes;
+          question.votes = action.payload.newUpvotes;
         }
         if (state.currentQuestion?.id === action.payload.id) {
-          state.currentQuestion.upvotes = action.payload.newUpvotes;
+          state.currentQuestion.votes = action.payload.newUpvotes;
         }
       })
       .addCase(upvoteQuestion.rejected, (state, action) => {

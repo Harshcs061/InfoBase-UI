@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../redux/store"; 
-import type { Question, User } from "../../redux/types"; 
+import type { Question} from "../../redux/types"; 
 import {
   upvoteQuestion,
   upvoteQuestionOptimistic,
   fetchQuestionById,
 } from "../../redux/slices/QuestionsSlice"; 
+import type { UserShort } from "../../services/Payload";
 
 type Props = {
   questionId: number;
@@ -16,7 +17,7 @@ type Props = {
   onEdit?: (id: number) => void;
 };
 
-const Avatar: React.FC<{ user: User; size?: number }> = ({ user, size = 36 }) => {
+export const Avatar: React.FC<{ user: UserShort; size?: number }> = ({ user, size = 36 }) => {
   const initials = user?.name
     ? user.name.split(" ").map((s) => s[0]).slice(0, 2).join("")
     : "U";
@@ -101,16 +102,10 @@ export default function DetailedQuestionCard({ questionId, canEdit = false, onSh
       console.error("Upvote thunk failed:", err);
       return { error: err };
     });
-
-    // if there was an error object returned, re-fetch to restore accurate state
     if ((res as any)?.error) {
       // re-fetch question
       dispatch(fetchQuestionById(questionId as number));
     } else {
-      // if server returned updated question in payload, you can optionally update local state:
-      // if your upvoteQuestion thunk returns the updated question, handle it here.
-      // Example:
-      // if (res?.question) setQuestion(res.question);
     }
   };
 
@@ -123,17 +118,17 @@ export default function DetailedQuestionCard({ questionId, canEdit = false, onSh
 
           <div className="mt-2 flex items-center gap-3 text-sm text-gray-600">
             <div className="flex items-center gap-2">
-              <Avatar user={question.author as User} size={36} />
+              <Avatar user={question.askedBy as UserShort} size={36} />
               <div className="flex flex-col leading-tight">
-                <span className="font-medium text-sm">{question.author?.name}</span>
-                <span className="text-xs text-gray-500">{new Date((question as any).askedAt ?? question.askedAt).toLocaleString()}</span>
+                <span className="font-medium text-sm">{question.askedBy.name}</span>
+                <span className="text-xs text-gray-500">{new Date((question as any).askedAt ?? question.createdAt).toLocaleString()}</span>
               </div>
             </div>
 
             <div className="hidden sm:block border-l h-6" />
 
             <div className="flex gap-3 items-center pl-3">
-              <div className="text-xs text-gray-500">{(question as any).answers ?? question.answers} answers</div>
+              <div className="text-xs text-gray-500">{(question as any).answers ?? question.answer_count} answers</div>
             </div>
           </div>
         </div>
@@ -183,7 +178,7 @@ export default function DetailedQuestionCard({ questionId, canEdit = false, onSh
               ▲
             </button>
 
-            <div className="text-sm font-semibold w-10 text-center">{(question as any).upvotes ?? question.upvotes}</div>
+            <div className="text-sm font-semibold w-10 text-center">{(question as any).upvotes ?? question.votes}</div>
 
             <button
               onClick={() => {

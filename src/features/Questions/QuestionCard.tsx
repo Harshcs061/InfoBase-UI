@@ -26,10 +26,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onUpvote }) => {
       {/* Author Info */}
       <div className="flex items-center gap-2 mb-3">
         <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-sm">
-          {question.author.initials}
+          {question.askedBy.name.charAt(0)}
         </div>
-        <span className="text-gray-700 font-medium">{question.author.name}</span>
-        <span className="text-gray-500 text-sm">asked {question.askedAt}</span>
+        <span className="text-gray-700 font-medium">{question.askedBy.name}</span>
+        <span className="text-gray-500 text-sm">asked {question.createdAt}</span>
       </div>
 
       {/* Question Title */}
@@ -62,15 +62,15 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onUpvote }) => {
           className="flex items-center gap-1 hover:text-indigo-600 transition-colors"
         >
           <ArrowUp className="w-4 h-4" />
-          <span className="font-medium">{question.upvotes}</span>
+          <span className="font-medium">{question.votes}</span>
         </button>
         <div className="flex items-center gap-1">
           <MessageCircle className="w-4 h-4" />
-          <span>{question.answers} answers</span>
+          <span>{question.answer_count} answers</span>
         </div>
         <div className="flex items-center gap-1 ml-auto">
           <Clock className="w-4 h-4" />
-          <span>{question.lastActivity}</span>
+          {/* <span>{question.lastActivity}</span> */}
         </div>
       </div>
     </div>

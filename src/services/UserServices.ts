@@ -7,7 +7,6 @@ export async function getUser(){
         if(token === '' || token === null){
             return null;
         }
-        // need to implement /me api
         const user = JSON.parse(atob(token.split('.')[1])) as User;
         return user;
 }
