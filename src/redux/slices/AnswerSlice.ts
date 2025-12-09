@@ -149,18 +149,18 @@ const answersSlice = createSlice({
         state.error = action.error.message ?? "Failed to fetch answers";
       })
       
-      // Upvote answer
-      .addCase(upvoteAnswer.fulfilled, (state, action) => {
-        // Optionally handle success response if backend returns updated vote count
-      })
-      .addCase(upvoteAnswer.rejected, (state, action) => {
-        state.error = action.error.message || 'Failed to upvote answer';
-      })
+      // // Upvote answer
+      // .addCase(upvoteAnswer.fulfilled, (state, action) => {
+      //   // Optionally handle success response if backend returns updated vote count
+      // })
+      // .addCase(upvoteAnswer.rejected, (state, action) => {
+      //   state.error = action.error.message || 'Failed to upvote answer';
+      // })
       
-      // Downvote answer
-      .addCase(downvoteAnswer.fulfilled, (state, action) => {
-        // Optionally handle success response if backend returns updated vote count
-      })
+      // // Downvote answer
+      // .addCase(downvoteAnswer.fulfilled, (state, action) => {
+      //   // Optionally handle success response if backend returns updated vote count
+      // })
       .addCase(downvoteAnswer.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to downvote answer';
       });

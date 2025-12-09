@@ -139,18 +139,18 @@ const questionsSlice = createSlice({
       })
       
       // Upvote question
-      .addCase(upvoteQuestion.fulfilled, (state, action) => {
-        // Optionally handle success response if backend returns updated vote count
-        // This can be used to sync with server if needed
-      })
+      // .addCase(upvoteQuestion.fulfilled, (state, action) => {
+      //   // Optionally handle success response if backend returns updated vote count
+      //   // This can be used to sync with server if needed
+      // })
       .addCase(upvoteQuestion.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to upvote question';
       })
       
       // Downvote question
-      .addCase(downvoteQuestion.fulfilled, (state, action) => {
-        // Optionally handle success response if backend returns updated vote count
-      })
+      // .addCase(downvoteQuestion.fulfilled, (state, action) => {
+      //   // Optionally handle success response if backend returns updated vote count
+      // })
       .addCase(downvoteQuestion.rejected, (state, action) => {
         state.error = action.error.message || 'Failed to downvote question';
       })
