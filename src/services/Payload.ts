@@ -57,6 +57,11 @@ export interface AnswerResponse{
     data:AnswerData;
 }
 
+export interface VotePayload{
+    votingId: number,
+    action: string
+}
+
 
 export const TOKEN_KEY = "Infobase-Token";
 

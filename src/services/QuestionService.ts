@@ -1,6 +1,6 @@
 import api from "../lib/api";
 import type { CreateQuestionPayload, Question } from "../redux/types";
-import type { AllQuestionResponse, AnswerResponse } from "./Payload";
+import type { AllQuestionResponse, AnswerResponse, VotePayload } from "./Payload";
 
 export async function createQuestionApi(questionData: CreateQuestionPayload) {
     const res = await api.post("api/questions", questionData);
@@ -25,3 +25,23 @@ export async function getAnswerByQId(QId:number): Promise<AnswerResponse> {
 export const postAnswer = async (questionId:number, body: string) => {
   return await api.post(`/api/questions/${questionId}/answers`, { body });
 };
+
+export async function voteQuestion(votePayload: VotePayload): Promise<boolean>{
+    const res = await api.post("api/question/vote", votePayload);
+    return res.data;
+}
+
+export async function voteAnswer(votePayload: VotePayload): Promise<boolean>{
+    const res = await api.post("api/answer/vote", votePayload);
+    return res.data;
+}
+
+export async function isUserVotedToQuestion(questionId: number):Promise<number>{
+    const res = await api.get(`api/question/getUserVote/${questionId}`);
+    return res.data;
+}
+
+export async function isUserVotedToAnswer(answerId: number):Promise<number>{
+    const res = await api.get(`api/answer/getUserVote/${answerId}`);
+    return res.data;
+}

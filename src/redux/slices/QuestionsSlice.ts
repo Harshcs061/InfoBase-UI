@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import type { Question, QuestionsState, CreateQuestionPayload } from '../types';
-import { createQuestionApi, getAllQuestions, getQuestionById } from '../../services/QuestionService';
+import { createQuestionApi, getAllQuestions, getQuestionById, voteQuestion } from '../../services/QuestionService';
+import type { VotePayload } from '../../services/Payload';
 
 export const fetchQuestions = createAsyncThunk(
   'questions/fetchQuestions',
@@ -9,6 +10,7 @@ export const fetchQuestions = createAsyncThunk(
     return response;
   }
 );
+
 export const fetchQuestionById = createAsyncThunk(
   'questions/fetchQuestionById',
   async (id: number) => {
@@ -18,82 +20,28 @@ export const fetchQuestionById = createAsyncThunk(
   }
 );
 
-// export const upvoteQuestion = createAsyncThunk(
-//   'questions/upvoteQuestion',
-//   async (questionId: number) => {
-//     return await mockApi.questions.upvote(questionId);
-//   }
-// );
+export const upvoteQuestion = createAsyncThunk(
+  'questions/upvoteQuestion',
+  async (questionId: number) => {
+    const votePayload: VotePayload = { votingId: questionId, action: "upvote" };
+    return voteQuestion(votePayload);
+  }
+);
 
-// NEW: Create question thunk
+export const downvoteQuestion = createAsyncThunk(
+  'questions/downvoteQuestion',
+  async (questionId: number) => {
+    const votePayload: VotePayload = { votingId: questionId, action: "downvote" };
+    return voteQuestion(votePayload);
+  }
+);
+
 export const createQuestion = createAsyncThunk(
   'questions/createQuestion',
   async (questionData: CreateQuestionPayload) => {
     return await createQuestionApi(questionData);
   }
 );
-
-// NEW: Update question thunk
-// export const updateQuestion = createAsyncThunk(
-//   'questions/updateQuestion',
-//   async ({ id, updates }: { id: number; updates: Partial<Question> }) => {
-//     return await mockApi.questions.update(id, updates);
-//   }
-// );
-
-// export const deleteQuestion = createAsyncThunk(
-//   'questions/deleteQuestion',
-//   async (id: number) => {
-//     await mockApi.questions.delete(id);
-//     return id;
-//   }
-// );
-
-// NEW: Search questions thunk
-// export const searchQuestions = createAsyncThunk(
-//   'questions/searchQuestions',
-//   async (query: string) => {
-//     return await mockApi.questions.search(query);
-//   }
-// );
-
-// NEW: Validate question thunk
-// export const validateQuestion = createAsyncThunk(
-//   'questions/validateQuestion',
-//   async (title: string) => {
-//     return await mockApi.questions.validate(title);
-//   }
-// );
-
-// NEW: Draft management thunks
-// export const fetchDrafts = createAsyncThunk(
-//   'questions/fetchDrafts',
-//   async () => {
-//     return await mockApi.drafts.getAll();
-//   }
-// );
-
-// export const saveDraft = createAsyncThunk(
-//   'questions/saveDraft',
-//   async (draft: Omit<QuestionDraft, 'id' | 'createdAt' | 'updatedAt'>) => {
-//     return await mockApi.drafts.save(draft);
-//   }
-// );
-
-// export const updateDraft = createAsyncThunk(
-//   'questions/updateDraft',
-//   async ({ id, updates }: { id: string; updates: Partial<QuestionDraft> }) => {
-//     return await mockApi.drafts.update(id, updates);
-//   }
-// );
-
-// export const deleteDraft = createAsyncThunk(
-//   'questions/deleteDraft',
-//   async (id: string) => {
-//     await mockApi.drafts.delete(id);
-//     return id;
-//   }
-// );
 
 const initialState: QuestionsState = {
   items: [],
@@ -110,7 +58,37 @@ const questionsSlice = createSlice({
     upvoteQuestionOptimistic: (state, action: PayloadAction<number>) => {
       const question = state.items.find(q => q.id === action.payload);
       if (question) {
-        question.votes += 1;
+        question.votes = (question.votes || 0) + 1;
+      }
+      if (state.currentQuestion && state.currentQuestion.id === action.payload) {
+        state.currentQuestion.votes = (state.currentQuestion.votes || 0) + 1;
+      }
+    },
+    downvoteQuestionOptimistic: (state, action: PayloadAction<number>) => {
+      const question = state.items.find(q => q.id === action.payload);
+      if (question) {
+        question.votes = (question.votes || 0) - 1;
+      }
+      if (state.currentQuestion && state.currentQuestion.id === action.payload) {
+        state.currentQuestion.votes = (state.currentQuestion.votes || 0) - 1;
+      }
+    },
+    revertUpvoteOptimistic: (state, action: PayloadAction<number>) => {
+      const question = state.items.find(q => q.id === action.payload);
+      if (question) {
+        question.votes = (question.votes || 0) - 1;
+      }
+      if (state.currentQuestion && state.currentQuestion.id === action.payload) {
+        state.currentQuestion.votes = (state.currentQuestion.votes || 0) - 1;
+      }
+    },
+    revertDownvoteOptimistic: (state, action: PayloadAction<number>) => {
+      const question = state.items.find(q => q.id === action.payload);
+      if (question) {
+        question.votes = (question.votes || 0) + 1;
+      }
+      if (state.currentQuestion && state.currentQuestion.id === action.payload) {
+        state.currentQuestion.votes = (state.currentQuestion.votes || 0) + 1;
       }
     },
     clearError: (state) => {
@@ -161,18 +139,21 @@ const questionsSlice = createSlice({
       })
       
       // Upvote question
-      // .addCase(upvoteQuestion.fulfilled, (state, action) => {
-      //   const question = state.items.find(q => q.id === action.payload.id);
-      //   if (question) {
-      //     question.votes = action.payload.newUpvotes;
-      //   }
-      //   if (state.currentQuestion?.id === action.payload.id) {
-      //     state.currentQuestion.votes = action.payload.newUpvotes;
-      //   }
-      // })
-      // .addCase(upvoteQuestion.rejected, (state, action) => {
-      //   state.error = action.error.message || 'Failed to upvote question';
-      // })
+      .addCase(upvoteQuestion.fulfilled, (state, action) => {
+        // Optionally handle success response if backend returns updated vote count
+        // This can be used to sync with server if needed
+      })
+      .addCase(upvoteQuestion.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to upvote question';
+      })
+      
+      // Downvote question
+      .addCase(downvoteQuestion.fulfilled, (state, action) => {
+        // Optionally handle success response if backend returns updated vote count
+      })
+      .addCase(downvoteQuestion.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to downvote question';
+      })
       
       // Create question
       .addCase(createQuestion.pending, (state) => {
@@ -186,87 +167,15 @@ const questionsSlice = createSlice({
       .addCase(createQuestion.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || 'Failed to create question';
-      })
-      
-      // Update question
-      //.addCase(updateQuestion.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(updateQuestion.fulfilled, (state, action) => {
-      //   state.isLoading = false;
-      //   const index = state.items.findIndex(q => q.id === action.payload.id);
-      //   if (index !== -1) {
-      //     state.items[index] = action.payload;
-      //   }
-      //   if (state.currentQuestion?.id === action.payload.id) {
-      //     state.currentQuestion = action.payload;
-      //   }
-      // })
-      // .addCase(updateQuestion.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error = action.error.message || 'Failed to update question';
-      // })
-      
-      // Delete question
-      // .addCase(deleteQuestion.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(deleteQuestion.fulfilled, (state, action) => {
-      //   state.isLoading = false;
-      //   state.items = state.items.filter(q => q.id !== action.payload);
-      //   if (state.currentQuestion?.id === action.payload) {
-      //     state.currentQuestion = null;
-      //   }
-      // })
-      // .addCase(deleteQuestion.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error = action.error.message || 'Failed to delete question';
-      // })
-      
-      // Search questions
-      // .addCase(searchQuestions.pending, (state) => {
-      //   state.isLoading = true;
-      //   state.error = null;
-      // })
-      // .addCase(searchQuestions.fulfilled, (state, action) => {
-      //   state.isLoading = false;
-      //   state.items = action.payload;
-      // })
-      // .addCase(searchQuestions.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   state.error = action.error.message || 'Failed to search questions';
-      // })
-      
-      // Fetch drafts
-      // .addCase(fetchDrafts.fulfilled, (state, action) => {
-      //   state.drafts = action.payload;
-      // })
-      
-      // // Save draft
-      // .addCase(saveDraft.fulfilled, (state, action) => {
-      //   state.drafts.push(action.payload);
-      // })
-      
-      // // Update draft
-      // .addCase(updateDraft.fulfilled, (state, action) => {
-      //   const index = state.drafts.findIndex(d => d.id === action.payload.id);
-      //   if (index !== -1) {
-      //     state.drafts[index] = action.payload;
-      //   }
-      // })
-      
-      // Delete draft
-      // .addCase(deleteDraft.fulfilled, (state, action) => {
-      //   state.drafts = state.drafts.filter(d => d.id !== action.payload);
-      // })
-      
+      });
   },
 });
 
 export const { 
-  upvoteQuestionOptimistic, 
+  upvoteQuestionOptimistic,
+  downvoteQuestionOptimistic,
+  revertUpvoteOptimistic,
+  revertDownvoteOptimistic,
   clearError, 
   setCurrentQuestion, 
   clearCurrentQuestion 

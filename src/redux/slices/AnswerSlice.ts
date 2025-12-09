@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { getAnswerByQId } from "../../services/QuestionService";
+import { getAnswerByQId, voteAnswer} from "../../services/QuestionService";
 import type { Answer } from "../types";
-
+import type { VotePayload } from "../../services/Payload";
 
 interface AnswersState {
   byId: Record<string, Answer>;
@@ -27,6 +27,22 @@ export const fetchAnswers = createAsyncThunk<
   return { questionId, answers: res.data.answers };
 });
 
+export const upvoteAnswer = createAsyncThunk(
+  'answers/upvoteAnswer',
+  async (answerId: number) => {
+    const votePayload: VotePayload = { votingId: answerId, action: "upvote" };
+    return voteAnswer(votePayload);
+  }
+);
+
+export const downvoteAnswer = createAsyncThunk(
+  'answers/downvoteAnswer',
+  async (answerId: number) => {
+    const votePayload: VotePayload = { votingId: answerId, action: "downvote" };
+    return voteAnswer(votePayload);
+  }
+);
+
 // Slice
 const answersSlice = createSlice({
   name: "answers",
@@ -42,6 +58,38 @@ const answersSlice = createSlice({
         state.idsByQuestion[qid] = [];
       }
       state.idsByQuestion[qid].push(answer.id);
+    },
+
+    upvoteAnswerOptimistic: (state, action: PayloadAction<number>) => {
+      const aid = String(action.payload);
+      const answer = state.byId[aid];
+      if (answer) {
+        answer.votes = (answer.votes || 0) + 1;
+      }
+    },
+
+    downvoteAnswerOptimistic: (state, action: PayloadAction<number>) => {
+      const aid = String(action.payload);
+      const answer = state.byId[aid];
+      if (answer) {
+        answer.votes = (answer.votes || 0) - 1;
+      }
+    },
+
+    revertUpvoteOptimistic: (state, action: PayloadAction<number>) => {
+      const aid = String(action.payload);
+      const answer = state.byId[aid];
+      if (answer) {
+        answer.votes = (answer.votes || 0) - 1;
+      }
+    },
+
+    revertDownvoteOptimistic: (state, action: PayloadAction<number>) => {
+      const aid = String(action.payload);
+      const answer = state.byId[aid];
+      if (answer) {
+        answer.votes = (answer.votes || 0) + 1;
+      }
     },
 
     updateVote: (state, action: PayloadAction<{ answerId: string | number; votes: number }>) => {
@@ -83,6 +131,7 @@ const answersSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+      // Fetch all answers for a question
       .addCase(fetchAnswers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -98,11 +147,36 @@ const answersSlice = createSlice({
       .addCase(fetchAnswers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message ?? "Failed to fetch answers";
+      })
+      
+      // Upvote answer
+      .addCase(upvoteAnswer.fulfilled, (state, action) => {
+        // Optionally handle success response if backend returns updated vote count
+      })
+      .addCase(upvoteAnswer.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to upvote answer';
+      })
+      
+      // Downvote answer
+      .addCase(downvoteAnswer.fulfilled, (state, action) => {
+        // Optionally handle success response if backend returns updated vote count
+      })
+      .addCase(downvoteAnswer.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to downvote answer';
       });
   },
 });
 
-export const { addAnswer, updateVote, updateAccepted, removeAnswer } = answersSlice.actions;
+export const {
+  addAnswer,
+  upvoteAnswerOptimistic,
+  downvoteAnswerOptimistic,
+  revertUpvoteOptimistic,
+  revertDownvoteOptimistic,
+  updateVote,
+  updateAccepted,
+  removeAnswer
+} = answersSlice.actions;
 
 export default answersSlice.reducer;
 
