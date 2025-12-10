@@ -7,6 +7,7 @@ import AskQuestionPage from '../pages/AskQuestionPage';
 import ProtectedRoute from './ProtectedRoute';
 import MyQuestionsPage from '../pages/MyQuestionPage';
 import RequestsPage from '../pages/RequestsPage';
+import SearchPage from '../pages/SearchPage';
 
 const router = createBrowserRouter([
   {path: "/login",
@@ -20,7 +21,8 @@ const router = createBrowserRouter([
       { path: "/ask", element: <AskQuestionPage /> },
       {path: "/question/:id", element: <ViewQuestionPage />},
       {path: "/question/me", element: <MyQuestionsPage />},
-      {path: "/requests", element: <RequestsPage />}
+      {path: "/requests", element: <RequestsPage />},
+      { path: "/search", element: <SearchPage /> },
     ],
   },
 ]);
