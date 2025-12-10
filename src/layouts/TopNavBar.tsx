@@ -1,5 +1,3 @@
-
-import { Search } from "lucide-react";
 import NotificationToggle from "../components/NotificationToggle";
 import ProfileToggle from "../components/ProfileToggle";
 import { useDispatch, useSelector } from "react-redux";
