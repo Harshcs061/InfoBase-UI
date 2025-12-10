@@ -1,4 +1,3 @@
-import { Search } from "lucide-react";
 import NotificationToggle from "../components/NotificationToggle";
 import ProfileToggle from "../components/ProfileToggle";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +6,7 @@ import type { User } from "../redux/types";
 import { TOKEN_KEY } from "../services/Payload";
 import { Logout } from "../redux/slices/UserSlice";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
 
 export default function TopNavbar() {
   const user= useSelector<RootState>((state) => state.users.user) as User;
@@ -26,21 +26,14 @@ export default function TopNavbar() {
         </button>
       </div>
 
+      {/* Centered search bar */}
       <div className="flex-1 flex justify-center px-6">
-        <div className="w-full max-w-3xl bg-gray-100 rounded-2xl px-4 py-2 flex items-center gap-2">
-          <Search className="w-5 h-5 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search questions..."
-            className="w-full bg-transparent outline-none text-gray-700"
-          />
-        </div>
+        <SearchBar />
       </div>
 
       <div className="flex items-center gap-4">
         <div className="relative">
           <NotificationToggle />
-        {/* <span className="absolute top-0 right-0 w-2 h-2 bg-blue-600 rounded-full"></span> */}
         </div>
 
         <ProfileToggle
