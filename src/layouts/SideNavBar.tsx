@@ -16,7 +16,7 @@ export default function SideNavbar() {
     { label: "Home", icon: Home, to: "/" },
     { label: "Ask Question", icon: Plus, to: "/ask" },
     { label: "My Questions", icon: HelpCircle, to: "/question/me" },
-    { label: "Categories", icon: Folder, to: "/categories" },
+    { label: "Request", icon: Folder, to: "/requests" },
     { label: "Tags", icon: Tags, to: "/tags" },
     { label: "Users", icon: Users, to: "/users" },
     { label: "Settings", icon: Settings, to: "/settings" },
