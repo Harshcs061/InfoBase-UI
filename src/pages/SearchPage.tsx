@@ -8,7 +8,6 @@ import {
   setPage,
   setSortBy,
 } from '../redux/slices/SearchSlice';
-import SearchBar from '../components/SearchBar';
 import { ChevronLeft, ChevronRight, MessageCircle, ArrowUp, Eye } from 'lucide-react';
 
 const SearchPage: React.FC = () => {
