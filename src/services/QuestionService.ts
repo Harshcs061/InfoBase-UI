@@ -36,6 +36,11 @@ export async function deleteQuestionApi(questionId:number): Promise<DeleteRespon
 
     return res.data;
 }
+export async function deleteAnswerApi(questionId:number): Promise<DeleteResponse>{
+    const res = await api.delete(`api/answers/${questionId}`);
+
+    return res.data;
+}
 
 export async function voteQuestion(votePayload: VotePayload): Promise<boolean>{
     const res = await api.post("api/question/vote", votePayload);

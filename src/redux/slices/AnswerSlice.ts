@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
-import { getAnswerByQId, voteAnswer} from "../../services/QuestionService";
+// src/redux/slices/AnswerSlice.ts
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import { getAnswerByQId, voteAnswer, deleteAnswerApi } from "../../services/QuestionService";
 import type { Answer } from "../types";
 import type { VotePayload } from "../../services/Payload";
 
@@ -18,88 +18,90 @@ const initialState: AnswersState = {
   error: null,
 };
 
-// Async Thunks
+/**
+ * Thunks
+ */
+
+// fetch answers for a question
 export const fetchAnswers = createAsyncThunk<
   { questionId: number; answers: Answer[] },
   { questionId: number }
 >("answers/fetch", async ({ questionId }) => {
   const res = await getAnswerByQId(questionId);
+  // expecting res.data.answers array
   return { questionId, answers: res.data.answers };
 });
 
+// upvote an answer (calls vote API)
 export const upvoteAnswer = createAsyncThunk(
-  'answers/upvoteAnswer',
+  "answers/upvoteAnswer",
   async (answerId: number) => {
     const votePayload: VotePayload = { votingId: answerId, action: "upvote" };
-    return voteAnswer(votePayload);
+    return await voteAnswer(votePayload);
   }
 );
 
+// downvote an answer (calls vote API)
 export const downvoteAnswer = createAsyncThunk(
-  'answers/downvoteAnswer',
+  "answers/downvoteAnswer",
   async (answerId: number) => {
     const votePayload: VotePayload = { votingId: answerId, action: "downvote" };
-    return voteAnswer(votePayload);
+    return await voteAnswer(votePayload);
   }
 );
 
-// Slice
+// delete an answer (calls delete endpoint on service)
+export const deleteAnswer = createAsyncThunk(
+  "answers/deleteAnswer",
+  async (answerId: number) => {
+    return await deleteAnswerApi(answerId);
+  }
+);
+
+/**
+ * Slice
+ */
 const answersSlice = createSlice({
   name: "answers",
   initialState,
   reducers: {
+    // add a single answer (used when creating a new answer locally)
     addAnswer: (state, action: PayloadAction<{ questionId: string | number; answer: Answer }>) => {
       const { questionId, answer } = action.payload;
       const qid = String(questionId);
       const aid = String(answer.id);
-      
+
       state.byId[aid] = answer;
-      if (!state.idsByQuestion[qid]) {
-        state.idsByQuestion[qid] = [];
+      if (!state.idsByQuestion[qid]) state.idsByQuestion[qid] = [];
+      // avoid duplicates
+      if (!state.idsByQuestion[qid].some((id) => String(id) === aid)) {
+        state.idsByQuestion[qid].push(answer.id);
       }
-      state.idsByQuestion[qid].push(answer.id);
     },
 
+    // optimistic vote changes (UI snappiness)
     upvoteAnswerOptimistic: (state, action: PayloadAction<number>) => {
       const aid = String(action.payload);
       const answer = state.byId[aid];
-      if (answer) {
-        answer.votes = (answer.votes || 0) + 1;
-      }
+      if (answer) answer.votes = (answer.votes || 0) + 1;
     },
-
     downvoteAnswerOptimistic: (state, action: PayloadAction<number>) => {
       const aid = String(action.payload);
       const answer = state.byId[aid];
-      if (answer) {
-        answer.votes = (answer.votes || 0) - 1;
-      }
+      if (answer) answer.votes = (answer.votes || 0) - 1;
     },
-
     revertUpvoteOptimistic: (state, action: PayloadAction<number>) => {
       const aid = String(action.payload);
       const answer = state.byId[aid];
-      if (answer) {
-        answer.votes = (answer.votes || 0) - 1;
-      }
+      if (answer) answer.votes = (answer.votes || 0) - 1;
     },
-
     revertDownvoteOptimistic: (state, action: PayloadAction<number>) => {
       const aid = String(action.payload);
       const answer = state.byId[aid];
-      if (answer) {
-        answer.votes = (answer.votes || 0) + 1;
-      }
+      if (answer) answer.votes = (answer.votes || 0) + 1;
     },
 
-    updateVote: (state, action: PayloadAction<{ answerId: string | number; votes: number }>) => {
-      const aid = String(action.payload.answerId);
-      const answer = state.byId[aid];
-      if (answer) {
-        answer.votes = action.payload.votes;
-      }
-    },
-
+    // update accepted state: marks the provided answer as accepted and others false for same question
     updateAccepted: (state, action: PayloadAction<{ answerId: string | number }>) => {
       const aid = String(action.payload.answerId);
       const answer = state.byId[aid];
@@ -116,6 +118,7 @@ const answersSlice = createSlice({
       });
     },
 
+    // remove answer from store (can be used for optimistic deletion too)
     removeAnswer: (state, action: PayloadAction<{ answerId: string | number }>) => {
       const aid = String(action.payload.answerId);
       const answer = state.byId[aid];
@@ -127,11 +130,16 @@ const answersSlice = createSlice({
       );
       delete state.byId[aid];
     },
+
+    // clear error helper
+    clearError: (state) => {
+      state.error = null;
+    },
   },
 
   extraReducers: (builder) => {
     builder
-      // Fetch all answers for a question
+      // fetch answers
       .addCase(fetchAnswers.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -148,21 +156,59 @@ const answersSlice = createSlice({
         state.loading = false;
         state.error = action.error.message ?? "Failed to fetch answers";
       })
-      
-      // // Upvote answer
-      // .addCase(upvoteAnswer.fulfilled, (state, action) => {
-      //   // Optionally handle success response if backend returns updated vote count
-      // })
-      // .addCase(upvoteAnswer.rejected, (state, action) => {
-      //   state.error = action.error.message || 'Failed to upvote answer';
-      // })
-      
-      // // Downvote answer
-      // .addCase(downvoteAnswer.fulfilled, (state, action) => {
-      //   // Optionally handle success response if backend returns updated vote count
-      // })
+
+      // upvote / downvote rejections (keep optimistic reducers for UI; server errors stored)
+      .addCase(upvoteAnswer.rejected, (state, action) => {
+        state.error = action.error.message ?? "Failed to upvote answer";
+      })
       .addCase(downvoteAnswer.rejected, (state, action) => {
-        state.error = action.error.message || 'Failed to downvote answer';
+        state.error = action.error.message ?? "Failed to downvote answer";
+      })
+
+      // handle delete answer lifecycle
+      .addCase(deleteAnswer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteAnswer.fulfilled, (state, action) => {
+        state.loading = false;
+        const payload = action.payload as any;
+        // try to extract deleted id from payload in multiple common shapes
+        const deletedId =
+          payload?.id ?? payload?.answer?.id ?? (payload?.data && payload.data.id) ?? null;
+
+        if (deletedId != null) {
+          const aid = String(deletedId);
+          const answer = state.byId[aid];
+          if (answer) {
+            const qid = String(answer.questionId);
+            state.idsByQuestion[qid] = (state.idsByQuestion[qid] || []).filter(
+              (id) => String(id) !== aid
+            );
+            delete state.byId[aid];
+          } else {
+            // If answer not found by id, attempt to scan and remove if any answer matches some payload shape
+            // (keeps robust for various backend responses)
+            if (Array.isArray(Object.values(state.byId))) {
+              for (const key of Object.keys(state.byId)) {
+                const a = state.byId[key];
+                if (String(a.id) === String(deletedId)) {
+                  const qid = String(a.questionId);
+                  state.idsByQuestion[qid] = (state.idsByQuestion[qid] || []).filter(
+                    (id) => String(id) !== key
+                  );
+                  delete state.byId[key];
+                }
+              }
+            }
+          }
+        } else {
+          // If API returned no id, we simply stop loading; caller can refetch if desired
+        }
+      })
+      .addCase(deleteAnswer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? "Failed to delete answer";
       });
   },
 });
@@ -173,14 +219,16 @@ export const {
   downvoteAnswerOptimistic,
   revertUpvoteOptimistic,
   revertDownvoteOptimistic,
-  updateVote,
   updateAccepted,
-  removeAnswer
+  removeAnswer,
+  clearError,
 } = answersSlice.actions;
 
 export default answersSlice.reducer;
 
-// Selectors
+/**
+ * Selectors
+ */
 export const selectAnswersForQuestion = (
   state: { answers: AnswersState },
   questionId: string | number
