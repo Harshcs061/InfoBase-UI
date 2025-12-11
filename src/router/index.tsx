@@ -8,6 +8,9 @@ import ProtectedRoute from './ProtectedRoute';
 import MyQuestionsPage from '../pages/MyQuestionPage';
 import RequestsPage from '../pages/RequestsPage';
 import SearchPage from '../pages/SearchPage';
+import UserPage from '../pages/UserPage';
+import SettingsPage from '../pages/SettingsPage';
+import TagsPage from '../pages/TagsPage';
 
 const router = createBrowserRouter([
   {path: "/login",
@@ -24,6 +27,9 @@ const router = createBrowserRouter([
       {path: "/question/me", element: <MyQuestionsPage />},
       {path: "/requests", element: <RequestsPage />},
       { path: "/search", element: <SearchPage /> },
+      { path: "/tags", element: <TagsPage /> },
+      { path: "/settings", element : <SettingsPage/>},
+      { path: "/users", element: <UserPage /> },
     ],
   },
 ]);
