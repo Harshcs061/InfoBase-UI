@@ -48,7 +48,7 @@ export default function TopNavbar() {
           name={user.name}
           avatarUrl={null}
           onViewProfile={() => {
-            console.log("view profile");
+            navigate("/me");
           }}
         onLogout={handleLogOut}
       />

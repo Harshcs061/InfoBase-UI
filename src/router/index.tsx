@@ -11,6 +11,7 @@ import SearchPage from '../pages/SearchPage';
 import UserPage from '../pages/UserPage';
 import SettingsPage from '../pages/SettingsPage';
 import TagsPage from '../pages/TagsPage';
+import ProfilePage from '../pages/ProfilePage';
 
 const router = createBrowserRouter([
   {path: "/login",
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { path: "/tags", element: <TagsPage /> },
       { path: "/settings", element : <SettingsPage/>},
       { path: "/users", element: <UserPage /> },
+      { path: "/me", element: <ProfilePage /> },
     ],
   },
 ]);
