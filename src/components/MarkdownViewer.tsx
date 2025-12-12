@@ -90,10 +90,6 @@ function CodeBlock({ language, children }: { language: string; children: string 
     </div>
   );
 }
-
-// ============================================================================
-// MarkdownViewer Component - Displays markdown content (for viewing questions)
-// ============================================================================
 type MarkdownViewerProps = {
   content: string;
   className?: string;

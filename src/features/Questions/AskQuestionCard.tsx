@@ -308,34 +308,34 @@ const AskQuestionCard: React.FC = () => {
             </div>
 
             {/* Detailed Description */}
-  <div>
-  <label className="block text-sm font-semibold text-gray-900 mb-2">
-    Detailed Description<span className="text-red-500">*</span>
-  </label>
+              <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Detailed Description<span className="text-red-500">*</span>
+              </label>
 
-  <Editor
-    value={description}
-    onChange={(val: React.SetStateAction<string>) => {
-      setDescription(val);
-      if (errors.description) setErrors({ ...errors, description: '' });
-    }}
-    placeholder="Provide all the relevant details..."
-    rows={10}
-  />
+              <Editor
+                value={description}
+                onChange={(val: React.SetStateAction<string>) => {
+                  setDescription(val);
+                  if (errors.description) setErrors({ ...errors, description: '' });
+                }}
+                placeholder="Provide all the relevant details..."
+                rows={10}
+              />
 
-  <div className="mt-2 text-sm text-gray-500 space-y-1">
-    <p>- What are you trying to achieve?</p>
-    <p>- What have you tried?</p>
-    <p>- What error messages are you seeing?</p>
-    <p className="mt-3 font-medium">
-      Include code samples, error messages, and context
-    </p>
-  </div>
+              <div className="mt-2 text-sm text-gray-500 space-y-1">
+                <p>- What are you trying to achieve?</p>
+                <p>- What have you tried?</p>
+                <p>- What error messages are you seeing?</p>
+                <p className="mt-3 font-medium">
+                  Include code samples, error messages, and context
+                </p>
+              </div>
 
-  {errors.description && (
-    <p className="text-sm text-red-600 mt-1">{errors.description}</p>
-  )}
-</div>
+              {errors.description && (
+                <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+              )}
+            </div>
 
             {/* Tags */}
             <div ref={tagDropdownRef}>

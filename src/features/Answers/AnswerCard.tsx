@@ -17,6 +17,7 @@ import type { UserShort } from "../../services/Payload";
 import { isUserVotedToAnswer } from "../../services/QuestionService";
 import { selectCommentsForAnswer } from "../../redux/slices/CommentSlice";
 import { useNavigate } from "react-router-dom";
+import MarkdownViewer from "../../components/MarkdownViewer";
 
 type Props = {
   answerId: number;
@@ -456,7 +457,7 @@ export default function AnswerCard({ answerId, showAcceptedBadge = true, canAcce
 
         {/* Body */}
         <div className="prose max-w-none text-sm mb-4">
-          <ReactMarkdown>{(answer as any).body ?? answer.body}</ReactMarkdown>
+          <MarkdownViewer content={(answer as any).body ?? answer.body} />
         </div>
 
         {/* Footer: votes at left, actions at right */}

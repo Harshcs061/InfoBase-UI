@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../redux/store";
 import { addAnswer } from "../../redux/slices/AnswerSlice";
 import { postAnswer } from "../../services/QuestionService";
+import Editor from "../../components/Editor";
 
 type Props = {
   questionId: number;
@@ -56,14 +57,21 @@ export default function AddAnswerForm({ questionId, onSuccess }: Props) {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <textarea
+          {/* <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Write your answer here... (Markdown supported)"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
             rows={8}
             disabled={loading}
-          />
+          /> */}
+          <Editor
+              value={body}
+              onChange={(val: React.SetStateAction<string>) => {
+                setBody(val)}}
+              placeholder="Write your answer here..."
+              rows={10}
+            />          
           {error && (
             <p className="mt-2 text-sm text-red-600">{error}</p>
           )}
