@@ -8,6 +8,7 @@ import { setProjects, setLoading as setProjectsLoading, setError as setProjectsE
 import { getAllProjects } from '../../services/ProjectService';
 import type { Project } from '../../redux/types';
 import {X, ChevronDown, CheckCircle } from 'lucide-react';
+import Editor from '../../components/Editor';
 
 const AskQuestionCard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -307,34 +308,34 @@ const AskQuestionCard: React.FC = () => {
             </div>
 
             {/* Detailed Description */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Detailed Description<span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => {
-                  setDescription(e.target.value);
-                  if (errors.description) setErrors({ ...errors, description: '' });
-                }}
-                placeholder="Provide all the relevant details..."
-                rows={8}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none ${
-                  errors.description ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              <div className="mt-2 text-sm text-gray-500 space-y-1">
-                <p>- What are you trying to achieve?</p>
-                <p>- What have you tried?</p>
-                <p>- What error messages are you seeing?</p>
-                <p className="mt-3 font-medium">
-                  Include code samples, error messages, and context
-                </p>
-              </div>
-              {errors.description && (
-                <p className="text-sm text-red-600 mt-1">{errors.description}</p>
-              )}
-            </div>
+  <div>
+  <label className="block text-sm font-semibold text-gray-900 mb-2">
+    Detailed Description<span className="text-red-500">*</span>
+  </label>
+
+  <Editor
+    value={description}
+    onChange={(val: React.SetStateAction<string>) => {
+      setDescription(val);
+      if (errors.description) setErrors({ ...errors, description: '' });
+    }}
+    placeholder="Provide all the relevant details..."
+    rows={10}
+  />
+
+  <div className="mt-2 text-sm text-gray-500 space-y-1">
+    <p>- What are you trying to achieve?</p>
+    <p>- What have you tried?</p>
+    <p>- What error messages are you seeing?</p>
+    <p className="mt-3 font-medium">
+      Include code samples, error messages, and context
+    </p>
+  </div>
+
+  {errors.description && (
+    <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+  )}
+</div>
 
             {/* Tags */}
             <div ref={tagDropdownRef}>

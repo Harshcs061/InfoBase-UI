@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUp, MessageCircle } from 'lucide-react';
 import type { Question } from '../../redux/types';
 import { useNavigate } from 'react-router-dom';
+import MarkdownViewer from '../../components/MarkdownViewer';
 
 interface QuestionCardProps {
   question: Question;
@@ -50,10 +51,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onUpvote }) => {
         {question.title}
       </h3>
 
-      {/* Question Description */}
-      <p className="text-gray-600 mb-4 line-clamp-2 md:line-clamp-3 lg:line-clamp-none">
-        {question.description}
-      </p>
+      {/* Question Description with MarkdownViewer - Limited to 3 lines */}
+      <div className="mb-4 line-clamp-3 overflow-hidden">
+        <MarkdownViewer 
+          content={question.description} 
+          className="text-sm md:text-base [&>*]:mb-0 [&>p]:mb-0 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>h1]:border-0 [&>h2]:border-0 [&>h1]:mb-0 [&>h2]:mb-0 [&>h3]:mb-0 [&>ul]:mb-0 [&>ol]:mb-0 [&>pre]:hidden [&>div]:hidden [&>blockquote]:mb-0"
+        />
+      </div>
 
       {/* Tags */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -80,7 +84,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onUpvote }) => {
           <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
           <span>{question.answer_count} answers</span>
         </div>
-        {/* Clock icon and lastActivity removed as requested */}
       </div>
     </div>
   );

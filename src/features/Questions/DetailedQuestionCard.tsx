@@ -17,6 +17,7 @@ import {
 } from "../../redux/slices/QuestionsSlice"; 
 import type { UserShort } from "../../services/Payload";
 import { isUserVotedToQuestion } from "../../services/QuestionService";
+import MarkdownViewer from "../../components/MarkdownViewer";
 
 type Props = {
   questionId: number;
@@ -544,7 +545,7 @@ export default function DetailedQuestionCard({ questionId, canEdit = false, onSh
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
-              <span className="font-medium">{(question as any).views ?? 0}</span>
+              <span className="font-medium">{(question as any).views ?? 40}</span>
               <span className="hidden sm:inline">views</span>
             </div>
           </div>
@@ -567,7 +568,7 @@ export default function DetailedQuestionCard({ questionId, canEdit = false, onSh
 
       {/* Body */}
       <div className="mt-6 prose prose-sm sm:prose max-w-none text-gray-700 leading-relaxed">
-        <ReactMarkdown>{(question as any).description ?? question.description}</ReactMarkdown>
+        <MarkdownViewer content={(question as any).description ?? question.description} />
       </div>
 
       {/* Footer: votes and actions */}
