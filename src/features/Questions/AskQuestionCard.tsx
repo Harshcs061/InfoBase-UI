@@ -9,6 +9,8 @@ import { getAllProjects } from '../../services/ProjectService';
 import type { Project } from '../../redux/types';
 import {X, ChevronDown, CheckCircle } from 'lucide-react';
 import Editor from '../../components/Editor';
+import QuestionSearchBeforeSubmit from '../../components/SearchBeforePosting';
+
 
 const AskQuestionCard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -37,6 +39,9 @@ const AskQuestionCard: React.FC = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [createdQuestionId, setCreatedQuestionId] = useState<number | null>(null);
 
+  // Search before submit dialog state
+  const [showSearchDialog, setShowSearchDialog] = useState(false);
+
   // Refs for dropdown handling
   const tagDropdownRef = useRef<HTMLDivElement>(null);
   const projectDropdownRef = useRef<HTMLDivElement>(null);
@@ -50,7 +55,7 @@ const AskQuestionCard: React.FC = () => {
       setIsLoadingTags(true);
       try {
         const result = await dispatch(getAllTags()).unwrap();
-        console.log('Fetched tags:', result); // Debug log
+        console.log('Fetched tags:', result);
         setAvailableTags(result);
       } catch (error) {
         console.error('Failed to fetch tags:', error);
@@ -136,8 +141,8 @@ const AskQuestionCard: React.FC = () => {
   };
 
   const handleAddTag = (tag: Tag) => {
-    console.log('Adding tag:', tag); // Debug log
-    console.log('Current selected tags:', selectedTags); // Debug log
+    console.log('Adding tag:', tag);
+    console.log('Current selected tags:', selectedTags);
     
     if (selectedTags.length >= 5) {
       console.warn('Maximum tags reached');
@@ -152,7 +157,7 @@ const AskQuestionCard: React.FC = () => {
 
     const updatedTags = [...selectedTags, tag];
     setSelectedTags(updatedTags);
-    console.log('Updated tags:', updatedTags); // Debug log
+    console.log('Updated tags:', updatedTags);
     
     setTagInput('');
     setShowTagSuggestions(false);
@@ -163,10 +168,10 @@ const AskQuestionCard: React.FC = () => {
   };
 
   const handleRemoveTag = (tagId: number) => {
-    console.log('Removing tag:', tagId); // Debug log
+    console.log('Removing tag:', tagId);
     const updatedTags = selectedTags.filter(tag => tag.id !== tagId);
     setSelectedTags(updatedTags);
-    console.log('Tags after removal:', updatedTags); // Debug log
+    console.log('Tags after removal:', updatedTags);
   };
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -197,7 +202,7 @@ const AskQuestionCard: React.FC = () => {
       !selectedTags.some(t => t.id === tag.id)
     );
     
-    console.log('Filtered tags:', filtered); // Debug log
+    console.log('Filtered tags:', filtered);
     return filtered;
   };
 
@@ -212,12 +217,18 @@ const AskQuestionCard: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Submitting with tags:', selectedTags); // Debug log
+    console.log('Submitting with tags:', selectedTags);
     
     if (!validateForm()) {
       return;
     }
 
+    // Show search dialog to check for similar questions
+    setShowSearchDialog(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setShowSearchDialog(false);
     setIsSubmitting(true);
 
     try {
@@ -243,6 +254,10 @@ const AskQuestionCard: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancelSearch = () => {
+    setShowSearchDialog(false);
   };
 
   const handleViewQuestion = () => {
@@ -308,7 +323,7 @@ const AskQuestionCard: React.FC = () => {
             </div>
 
             {/* Detailed Description */}
-              <div>
+            <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Detailed Description<span className="text-red-500">*</span>
               </label>
@@ -545,6 +560,15 @@ const AskQuestionCard: React.FC = () => {
           </form>
         </div>
       </div>
+
+      {/* Search Before Submit Dialog */}
+      {showSearchDialog && (
+        <QuestionSearchBeforeSubmit
+          title={title}
+          onConfirm={handleConfirmSubmit}
+          onCancel={handleCancelSearch}
+        />
+      )}
 
       {/* Success Dialog */}
       {showSuccessDialog && (

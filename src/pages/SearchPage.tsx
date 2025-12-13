@@ -45,7 +45,7 @@ const SearchPage: React.FC = () => {
       dispatch(setSortBy(urlSort as any));
     }
 
-    // Trigger search
+
     dispatch(
       searchQuestions({
         query: urlQuery || '',
@@ -54,9 +54,9 @@ const SearchPage: React.FC = () => {
         sortBy: urlSort,
       })
     );
-  }, [searchParams]); // Only re-run when URL changes
+  }, [searchParams]); 
 
-  // Handle sort change
+  
   const handleSortChange = (newSortBy: string) => {
     dispatch(setSortBy(newSortBy as any));
     dispatch(setPage(1));
